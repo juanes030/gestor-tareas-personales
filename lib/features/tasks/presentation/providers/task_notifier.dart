@@ -34,6 +34,32 @@ class TaskNotifier extends AsyncNotifier<List<Task>> {
     state = AsyncData(await _repository.getTasks());
   }
 
+  Future<void> updateTask({
+    required String id,
+    required String title,
+    required String description,
+  }) async {
+    final tasks = await _repository.getTasks();
+
+    final currentTask = tasks.firstWhere((task) => task.id == id);
+
+    final updatedTask = currentTask.copyWith(
+      title: title,
+      description: description,
+      updatedAt: DateTime.now(),
+    );
+
+    await _repository.updateTask(updatedTask);
+
+    state = AsyncData(await _repository.getTasks());
+  }
+
+  Future<void> deleteTask(String id) async {
+    await _repository.deleteTask(id);
+
+    state = AsyncData(await _repository.getTasks());
+  }
+
   Future<void> toggleTask(Task task) async {
     final updatedTask = task.copyWith(
       isCompleted: !task.isCompleted,

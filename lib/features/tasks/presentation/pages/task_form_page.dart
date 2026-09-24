@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../domain/entities/task.dart';
 import '../providers/task_providers.dart';
 
 class TaskFormPage extends ConsumerStatefulWidget {
-  const TaskFormPage({super.key});
+  const TaskFormPage({this.task, super.key});
+
+  final Task? task;
 
   @override
   ConsumerState<TaskFormPage> createState() => _TaskFormPageState();
@@ -15,6 +18,18 @@ class _TaskFormPageState extends ConsumerState<TaskFormPage> {
 
   final _titleController = TextEditingController();
   final _descriptionController = TextEditingController();
+
+  bool get isEditing => widget.task != null;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.task != null) {
+      _titleController.text = widget.task!.title;
+      _descriptionController.text = widget.task!.description;
+    }
+  }
 
   @override
   void dispose() {
@@ -28,24 +43,32 @@ class _TaskFormPageState extends ConsumerState<TaskFormPage> {
       return;
     }
 
-    await ref
-        .read(taskNotifierProvider.notifier)
-        .createTask(
-          title: _titleController.text.trim(),
-          description: _descriptionController.text.trim(),
-        );
+    final notifier = ref.read(taskNotifierProvider.notifier);
+
+    if (isEditing) {
+      await notifier.updateTask(
+        id: widget.task!.id,
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
+    } else {
+      await notifier.createTask(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+      );
+    }
 
     if (!mounted) {
       return;
     }
 
-    Navigator.pop(context); 
+    Navigator.pop(context);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Nueva tarea')),
+      appBar: AppBar(title: Text(isEditing ? 'Editar tarea' : 'Nueva tarea')),
       body: Form(
         key: _formKey,
         child: Padding(
@@ -80,7 +103,7 @@ class _TaskFormPageState extends ConsumerState<TaskFormPage> {
                 width: double.infinity,
                 child: FilledButton(
                   onPressed: _saveTask,
-                  child: const Text('Crear tarea'),
+                  child: Text(isEditing ? 'Guardar cambios' : 'Crear tarea'),
                 ),
               ),
             ],
