@@ -1,64 +1,91 @@
 # Gestor de Tareas Personales
 
-Aplicación móvil desarrollada en Flutter como parte del **Reto 1 de Pragma**.
+Aplicación móvil desarrollada con **Flutter** como parte del **Reto 1 de Pragma**.
 
-El objetivo del proyecto es construir una aplicación CRUD completa utilizando **Flutter, Riverpod 3 y almacenamiento local**, permitiendo gestionar tareas personales sin necesidad de conexión a un backend.
+El proyecto consiste en una aplicación CRUD para gestionar tareas personales utilizando **Riverpod 3** para el manejo de estado y **SharedPreferences** para la persistencia local.
+
+La aplicación funciona completamente de manera local y no requiere conexión a un backend.
+
+---
 
 ## 🎯 Objetivo
 
-Construir una aplicación que permita:
+Construir una aplicación de gestión de tareas que permita al usuario:
 
-* Crear tareas.
-* Visualizar una lista de tareas.
-* Consultar el detalle de una tarea.
-* Editar tareas existentes.
-* Eliminar tareas.
-* Marcar tareas como completadas.
-* Mantener la información almacenada aunque la aplicación se cierre.
+- Crear tareas.
+- Visualizar sus tareas.
+- Consultar el detalle de una tarea.
+- Editar tareas existentes.
+- Eliminar tareas.
+- Marcar y desmarcar tareas como completadas.
+- Filtrar tareas por estado.
+- Mantener la información almacenada después de cerrar la aplicación.
+
+---
 
 ## ✨ Funcionalidades
 
 ### Gestión de tareas
 
-* [ ] Crear una tarea.
-* [ ] Listar tareas.
-* [ ] Ver detalle de una tarea.
-* [ ] Editar una tarea.
-* [ ] Eliminar una tarea.
-* [ ] Marcar una tarea como completada.
-* [ ] Mostrar estado vacío cuando no existan tareas.
+- [x] Crear una tarea.
+- [x] Listar tareas.
+- [x] Consultar el detalle de una tarea.
+- [x] Editar una tarea.
+- [x] Eliminar una tarea con confirmación.
+- [x] Marcar una tarea como completada.
+- [x] Desmarcar una tarea.
+- [x] Filtrar tareas entre todas, pendientes y completadas.
+- [x] Mostrar un estado vacío cuando no existan tareas.
 
 ### Formularios
 
-* [ ] Formulario para crear tareas.
-* [ ] Formulario para editar tareas.
-* [ ] Validaciones básicas.
-* [ ] Manejo correcto de estados del formulario.
+- [x] Formulario para crear tareas.
+- [x] Formulario reutilizado para editar tareas.
+- [x] Validación del título.
+- [x] Manejo de estados durante el guardado.
+- [x] Indicador visual mientras se guarda una tarea.
 
 ### Persistencia
 
-* [ ] Guardar tareas localmente.
-* [ ] Recuperar tareas al iniciar la aplicación.
-* [ ] Mantener la información después de cerrar la aplicación.
+- [x] Guardar tareas localmente.
+- [x] Recuperar tareas al iniciar la aplicación.
+- [x] Mantener la información después de cerrar y volver a abrir la aplicación.
+
+### Experiencia de usuario
+
+- [x] Interfaz basada en Material 3.
+- [x] Diseño visual consistente.
+- [x] Indicador de progreso de tareas.
+- [x] Estados visuales para tareas pendientes y completadas.
+- [x] Confirmación antes de eliminar.
+- [x] Estados de carga y error.
+- [x] Empty state personalizado.
+- [x] Filtros rápidos por estado.
+- [x] Feedback visual durante las acciones principales.
+
+---
 
 ## 🛠️ Tecnologías
 
-* **Flutter**
-* **Dart**
-* **Riverpod 3** — Manejo de estado.
-* **SharedPreferences** — Persistencia local.
+- **Flutter** — Framework para desarrollo multiplataforma.
+- **Dart** — Lenguaje de programación.
+- **Riverpod 3** — Manejo de estado y operaciones de la aplicación.
+- **SharedPreferences** — Persistencia local.
+- **Material 3** — Sistema de diseño utilizado como base para la interfaz.
+
+No se utilizan servicios externos ni backend para la gestión de las tareas.
+
+---
 
 ## 🏗️ Arquitectura
 
-El proyecto utiliza una arquitectura organizada por funcionalidades (**feature-based architecture**), separando las responsabilidades en capas.
+El proyecto utiliza una arquitectura organizada por funcionalidades (**feature-based architecture**) y separa las responsabilidades en capas.
 
 ```text
 lib/
 │
 ├── app/
-│   ├── app.dart
-│   └── router/
-│       └── app_router.dart
+│   └── app.dart
 │
 ├── core/
 │   ├── constants/
@@ -68,130 +95,246 @@ lib/
 ├── features/
 │   └── tasks/
 │       ├── data/
+│       │   ├── datasources/
+│       │   ├── models/
+│       │   └── repositories/
+│       │
 │       ├── domain/
+│       │   ├── entities/
+│       │   └── repositories/
+│       │
 │       └── presentation/
+│           ├── pages/
+│           ├── providers/
+│           └── widgets/
 │
 └── main.dart
 ```
 
 ### Capas principales
 
-**Presentation**
+#### Presentation
 
-Contiene las pantallas, widgets y providers/notifiers utilizados para manejar el estado de la interfaz.
+Contiene las pantallas, widgets y providers/notifiers utilizados para manejar el estado y la interacción con el usuario.
 
-**Domain**
+#### Domain
 
 Contiene las entidades y contratos de repositorio relacionados con las tareas.
 
-**Data**
+Esta capa no depende de detalles relacionados con el almacenamiento.
 
-Contiene los modelos, fuentes de datos locales y la implementación de los repositorios.
+#### Data
 
-El flujo principal de datos será:
+Contiene los modelos, fuentes de datos locales y la implementación concreta de los repositorios.
+
+---
+
+## 🔄 Flujo de datos
+
+Las operaciones de la aplicación siguen el siguiente flujo:
 
 ```text
 UI
  ↓
-Riverpod
+Riverpod / TaskNotifier
  ↓
-Repository
+TaskRepository
  ↓
-Local Data Source
+TaskLocalDataSource
  ↓
 SharedPreferences
 ```
 
-## 📱 Pantallas
+Esto permite mantener separada la interfaz de usuario de la implementación utilizada para almacenar los datos.
 
-La aplicación contará inicialmente con las siguientes pantallas:
+---
+
+## 📱 Pantallas
 
 ### Lista de tareas
 
-Pantalla principal donde el usuario podrá:
+Pantalla principal de la aplicación.
 
-* Ver sus tareas.
-* Marcar tareas como completadas.
-* Acceder al detalle.
-* Editar tareas.
-* Eliminar tareas.
-* Crear una nueva tarea.
+Permite:
+
+- Visualizar las tareas.
+- Consultar el progreso general.
+- Filtrar tareas.
+- Marcar tareas como completadas.
+- Acceder al detalle.
+- Editar tareas.
+- Eliminar tareas.
+- Crear nuevas tareas.
 
 ### Detalle de tarea
 
-Muestra la información completa de una tarea seleccionada.
+Muestra información completa de la tarea:
+
+- Título.
+- Descripción.
+- Estado.
+- Fecha de creación.
+- Fecha de última actualización.
 
 ### Crear / Editar tarea
 
-Formulario utilizado para crear nuevas tareas y modificar tareas existentes.
+Formulario reutilizable para:
+
+- Crear nuevas tareas.
+- Editar tareas existentes.
+- Validar la información ingresada.
+- Mostrar el estado de guardado.
+
+---
+
+## 🎨 Diseño y experiencia de usuario
+
+La aplicación utiliza una interfaz enfocada en productividad, simplicidad y claridad visual.
+
+Entre los elementos principales se incluyen:
+
+- Cards con bordes redondeados.
+- Sistema visual consistente.
+- Indicadores de estado.
+- Resumen de progreso.
+- Filtros rápidos.
+- Estados vacíos personalizados.
+- Feedback visual para acciones importantes.
+- Confirmación antes de eliminar información.
+- Estados de carga y error.
+- Formularios con validación.
+- Diseño basado en Material 3.
+
+---
 
 ## 📦 Instalación
 
-Clonar el repositorio:
+### 1. Clonar el repositorio
 
 ```bash
-git clone <REPOSITORY_URL>
+git clone https://github.com/juanes030/gestor-tareas-personales.git
 ```
 
-Entrar al proyecto:
+### 2. Entrar al proyecto
 
 ```bash
-cd gestor_tareas_personales
+cd gestor-tareas-personales
 ```
 
-Instalar las dependencias:
+### 3. Instalar dependencias
 
 ```bash
 flutter pub get
 ```
 
-Ejecutar la aplicación:
+### 4. Ejecutar la aplicación
 
 ```bash
 flutter run
 ```
 
+---
+
 ## 🧪 Testing
 
-Los tests se irán agregando durante el desarrollo para validar principalmente:
+Se contemplan pruebas automatizadas para validar:
 
-* Operaciones CRUD.
-* Validaciones.
-* Manejo del estado.
-* Persistencia local.
-* Comportamiento de los componentes principales.
+- Operaciones CRUD.
+- Validaciones de formularios.
+- Manejo del estado.
+- Persistencia local.
+- Comportamiento de los componentes principales.
+
+Las pruebas automatizadas son una etapa de mejora posterior a la implementación funcional de la aplicación.
+
+---
+
+## 🔍 Análisis del proyecto
+
+Para verificar problemas de análisis estático:
+
+```bash
+flutter analyze
+```
+
+El proyecto debe mantenerse sin errores de análisis antes de realizar una entrega.
+
+---
 
 ## 📸 Capturas
 
-Las capturas de pantalla se agregarán una vez finalizada la implementación de la aplicación.
+Las capturas de pantalla de la aplicación pueden incluir:
+
+- Lista de tareas.
+- Crear tarea.
+- Editar tarea.
+- Detalle de tarea.
+- Tareas completadas.
+- Estado vacío.
+
+---
 
 ## 🎥 Demo
 
-Se agregará un video demostrativo mostrando:
+La demo puede mostrar el siguiente flujo:
 
-1. Creación de una tarea.
-2. Listado de tareas.
-3. Consulta del detalle.
-4. Edición de una tarea.
-5. Marcado como completada.
-6. Eliminación de una tarea.
-7. Persistencia después de cerrar y volver a abrir la aplicación.
+1. Crear una tarea.
+2. Visualizarla en la lista.
+3. Consultar su detalle.
+4. Editar la tarea.
+5. Marcarla como completada.
+6. Filtrar tareas.
+7. Eliminar una tarea.
+8. Cerrar y volver a abrir la aplicación.
+9. Comprobar la persistencia de los datos.
+
+---
 
 ## 📚 Reto
 
-Proyecto desarrollado como parte de la:
+Proyecto desarrollado como parte de:
 
 **FASE 1 — Aplicación CRUD con almacenamiento local**
 
 ### Objetivos de aprendizaje
 
-* Construcción de pantallas en Flutter.
-* Navegación.
-* Formularios.
-* Validaciones.
-* Manejo de estado con Riverpod 3.
-* Persistencia local.
-* Implementación de un flujo CRUD completo.
+- Construcción de interfaces en Flutter.
+- Arquitectura organizada por funcionalidades.
+- Navegación entre pantallas.
+- Formularios y validaciones.
+- Manejo de estado con Riverpod 3.
+- Persistencia local.
+- Implementación de operaciones CRUD.
+- Diseño y experiencia de usuario.
+- Separación de responsabilidades mediante Repository Pattern.
+
+---
+
+## 🚀 Estado del proyecto
+
+El proyecto cuenta con todas las funcionalidades principales solicitadas para el Reto 1 y se encuentra en etapa de revisión y mejora de calidad.
+
+### Funcionalidades completadas
+
+- CRUD completo de tareas.
+- Persistencia local.
+- Manejo de estado con Riverpod 3.
+- Navegación entre pantallas.
+- Filtros de tareas.
+- Validaciones.
+- Estados de carga y error.
+- Diseño visual personalizado.
+- Empty state.
+- Detalle de tareas.
+
+### Próximas mejoras
+
+- Agregar pruebas automatizadas.
+- Incorporar capturas de pantalla.
+- Preparar una demo de la aplicación.
+- Realizar revisión final de código y arquitectura.
+
+---
 
 ## 👨‍💻 Autor
 
